@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useReports } from '../context/ReportContext';
 import { DEPARTMENT_USERS } from '../data/seedData';
 import ReportCard from '../components/report/ReportCard';
-import { Users, FileCheck, ArrowLeft, Download, CheckCircle2, Waves, Building2, Calendar, X } from 'lucide-react';
+import { Users, FileCheck, ArrowLeft, Download, CheckCircle2, Waves, Building2, Calendar, X, Eye } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export default function AdminAuditPage() {
@@ -208,6 +208,8 @@ export default function AdminAuditPage() {
           {DEPARTMENT_USERS.map(user => {
             const userReports = reports.filter(r => r.reporterName === user.name);
             const userReviewed = userReports.filter(r => r.status === 'reviewed').length;
+            const userLuar = userReports.filter(r => r.activityType === 'luar_kantor').length;
+            const userDalam = userReports.filter(r => r.activityType === 'dalam_kantor').length;
 
             return (
               <div key={user.id} className="p-3 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between text-xs">
@@ -218,11 +220,30 @@ export default function AdminAuditPage() {
                   <div>
                     <h4 className="font-bold text-slate-800">{user.name}</h4>
                     <p className="text-[10px] text-slate-500">{user.role}</p>
+                    <div className="flex items-center gap-2 mt-1 text-[10px] text-slate-500 font-medium">
+                      <span className="flex items-center gap-0.5 text-blue-700">
+                        <Waves size={10} /> {userLuar} Lapangan
+                      </span>
+                      <span>•</span>
+                      <span className="flex items-center gap-0.5 text-emerald-700">
+                        <Building2 size={10} /> {userDalam} Internal
+                      </span>
+                    </div>
                   </div>
                 </div>
-                <div className="text-right">
-                  <span className="font-bold text-emerald-800 text-xs block">{userReports.length} Kegiatan</span>
-                  <span className="text-[10px] text-slate-400">{userReviewed} disetujui</span>
+                <div className="flex items-center gap-3">
+                  <div className="text-right">
+                    <span className="font-bold text-emerald-800 text-xs block">{userReports.length} Total</span>
+                    <span className="text-[10px] text-slate-400">{userReviewed} disetujui</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => navigate(`/profil?user=${encodeURIComponent(user.name)}`)}
+                    className="p-2 rounded-xl bg-emerald-100 hover:bg-emerald-200 text-emerald-800 transition-colors cursor-pointer"
+                    title={`Lihat Profil ${user.name}`}
+                  >
+                    <Eye size={14} />
+                  </button>
                 </div>
               </div>
             );

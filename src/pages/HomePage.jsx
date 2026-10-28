@@ -10,10 +10,12 @@ export default function HomePage() {
   return (
     <div className="flex flex-col flex-1 pb-6">
       {/* Jika role admin, tampilkan panel ringkasan monitoring keseluruhan sistem */}
-      {currentUserRole === 'admin' && <AdminDashboardSummary />}
-
-      {/* 4 Kartu Metrik Gradien Toska 2-Kolom Sesuai Referensi Visual */}
-      <MetricGrid />
+      {currentUserRole === 'admin' ? (
+        <AdminDashboardSummary />
+      ) : (
+        /* 4 Kartu Metrik Gradien Toska 2-Kolom Sesuai Referensi Visual (Hanya untuk Pegawai/User) */
+        <MetricGrid />
+      )}
 
       {/* Feed Kegiatan Terkini Sesuai Referensi Foto */}
       <RecentActivityList />
