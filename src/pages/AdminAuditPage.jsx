@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useReports } from '../context/ReportContext';
 import { DEPARTMENT_USERS } from '../data/seedData';
 import ReportCard from '../components/report/ReportCard';
@@ -9,8 +9,20 @@ export default function AdminAuditPage() {
   const { reports, totalCount, reviewedCount } = useReports();
   const navigate = useNavigate();
 
+  const [activeFilter, setActiveFilter] = useState('all'); // 'all' | 'pending' | 'reviewed' | 'revision'
+
   const revisionReports = reports.filter(r => r.status === 'revision');
   const pendingReports = reports.filter(r => r.status === 'pending' || !r.comments || r.comments.length === 0);
+  const reviewedReports = reports.filter(r => r.status === 'reviewed' && r.comments && r.comments.length > 0);
+
+  const getFilteredReports = () => {
+    if (activeFilter === 'pending') return pendingReports;
+    if (activeFilter === 'reviewed') return reviewedReports;
+    if (activeFilter === 'revision') return revisionReports;
+    return reports;
+  };
+
+  const displayedReports = getFilteredReports();
 
   const handleExportData = () => {
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(reports, null, 2));
@@ -56,18 +68,44 @@ export default function AdminAuditPage() {
 
       {/* Ringkasan Status Audit */}
       <div className="grid grid-cols-3 gap-2 mb-4">
-        <div className="bg-white p-3 rounded-2xl border border-slate-100 shadow-xs text-center">
-          <span className="text-[10px] text-slate-400 block font-medium">Total Arsip</span>
-          <strong className="text-lg font-black text-slate-800">{totalCount}</strong>
-        </div>
-        <div className="bg-amber-50 p-3 rounded-2xl border border-amber-100 shadow-xs text-center">
-          <span className="text-[10px] text-amber-600 block font-medium">Pending Review</span>
-          <strong className="text-lg font-black text-amber-700">{pendingReports.length}</strong>
-        </div>
-        <div className="bg-emerald-50 p-3 rounded-2xl border border-emerald-100 shadow-xs text-center">
-          <span className="text-[10px] text-emerald-600 block font-medium">Disetujui</span>
-          <strong className="text-lg font-black text-emerald-700">{reviewedCount}</strong>
-        </div>
+        <button
+          type="button"
+          onClick={() => setActiveFilter('all')}
+          className={`p-3 rounded-2xl border text-center transition-all cursor-pointer ${
+            activeFilter === 'all'
+              ? 'bg-slate-900 text-white border-slate-900 shadow-md'
+              : 'bg-white text-slate-800 border-slate-100 hover:bg-slate-50'
+          }`}
+        >
+          <span className={`text-[10px] block font-medium ${activeFilter === 'all' ? 'text-slate-300' : 'text-slate-400'}`}>Total Arsip</span>
+          <strong className="text-lg font-black">{totalCount}</strong>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveFilter('pending')}
+          className={`p-3 rounded-2xl border text-center transition-all cursor-pointer ${
+            activeFilter === 'pending'
+              ? 'bg-amber-600 text-white border-amber-600 shadow-md'
+              : 'bg-amber-50 text-amber-900 border-amber-100 hover:bg-amber-100/70'
+          }`}
+        >
+          <span className={`text-[10px] block font-medium ${activeFilter === 'pending' ? 'text-amber-100' : 'text-amber-600'}`}>Pending Review</span>
+          <strong className="text-lg font-black">{pendingReports.length}</strong>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveFilter('reviewed')}
+          className={`p-3 rounded-2xl border text-center transition-all cursor-pointer ${
+            activeFilter === 'reviewed'
+              ? 'bg-emerald-700 text-white border-emerald-700 shadow-md'
+              : 'bg-emerald-50 text-emerald-900 border-emerald-100 hover:bg-emerald-100/70'
+          }`}
+        >
+          <span className={`text-[10px] block font-medium ${activeFilter === 'reviewed' ? 'text-emerald-100' : 'text-emerald-600'}`}>Disetujui</span>
+          <strong className="text-lg font-black">{reviewedCount}</strong>
+        </button>
       </div>
       {/* Seksion 1: Daftar Pegawai & Aktivitas */}
       <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-xs mb-4 space-y-3">
@@ -104,23 +142,35 @@ export default function AdminAuditPage() {
         </div>
       </div>
 
-      {/* Seksion 2: Laporan Perlu Perhatian / Pending / Revisi */}
+      {/* Seksion 2: Daftar Laporan Sesuai Filter Aktif */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <h3 className="text-xs font-bold text-slate-900 flex items-center gap-1.5 uppercase tracking-wider">
             <FileCheck size={14} className="text-emerald-700" />
-            Laporan Memerlukan Perhatian ({pendingReports.length + revisionReports.length})
+            {activeFilter === 'all' && `Semua Laporan Kegiatan (${displayedReports.length})`}
+            {activeFilter === 'pending' && `Laporan Menunggu Review (${displayedReports.length})`}
+            {activeFilter === 'reviewed' && `Laporan Telah Disetujui (${displayedReports.length})`}
+            {activeFilter === 'revision' && `Laporan Catatan / Revisi (${displayedReports.length})`}
           </h3>
+
+          {activeFilter !== 'all' && (
+            <button
+              type="button"
+              onClick={() => setActiveFilter('all')}
+              className="text-[11px] text-emerald-700 hover:text-emerald-900 font-bold underline cursor-pointer"
+            >
+              Reset Filter
+            </button>
+          )}
         </div>
 
-        {[...pendingReports, ...revisionReports].length === 0 ? (
-          <div className="bg-white rounded-2xl p-6 text-center border border-slate-100">
+        {displayedReports.length === 0 ? (
+          <div className="bg-white rounded-2xl p-8 text-center border border-slate-100">
             <CheckCircle2 size={32} className="mx-auto text-emerald-600 mb-2" />
-            <p className="text-xs font-bold text-slate-800">Semua laporan telah ditinjau dengan baik!</p>
-            <p className="text-[11px] text-slate-400 mt-0.5">Tidak ada laporan yang tertunda.</p>
+            <p className="text-xs font-bold text-slate-800">Tidak ada laporan pada kategori ini.</p>
           </div>
         ) : (
-          [...pendingReports, ...revisionReports].map(report => (
+          displayedReports.map(report => (
             <ReportCard key={report.id} report={report} />
           ))
         )}
