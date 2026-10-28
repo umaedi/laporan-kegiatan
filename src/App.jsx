@@ -8,6 +8,7 @@ import CreateReportPage from './pages/CreateReportPage';
 import ReportDetailPage from './pages/ReportDetailPage';
 import AppreciationPage from './pages/AppreciationPage';
 import ProfilePage from './pages/ProfilePage';
+import AdminAuditPage from './pages/AdminAuditPage';
 
 export default function App() {
   return (
@@ -21,6 +22,7 @@ export default function App() {
             <Route path="kegiatan/:id" element={<ReportDetailPage />} />
             <Route path="apresiasi" element={<AppreciationPage />} />
             <Route path="profil" element={<ProfilePage />} />
+            <Route path="audit-sistem" element={<AdminAuditPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>

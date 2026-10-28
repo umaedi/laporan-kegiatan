@@ -1,6 +1,7 @@
 import React from 'react';
 import { useReports } from '../../context/ReportContext';
-import { Shield, ArrowUpRight, CheckCircle2, Clock, AlertCircle, Compass, Building, Activity } from 'lucide-react';
+import { DEPARTMENT_USERS } from '../../data/seedData';
+import { Shield, ArrowUpRight, CheckCircle2, Clock, AlertCircle, Compass, Building, Activity, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function AdminDashboardSummary() {
@@ -37,7 +38,7 @@ export default function AdminDashboardSummary() {
           </div>
         </div>
         <Link
-          to="/kegiatan"
+          to="/audit-sistem"
           className="group inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-400 hover:text-emerald-300 transition-colors bg-emerald-500/10 px-3 py-1.5 rounded-full border border-emerald-500/20"
         >
           <span>Audit Sistem</span>
@@ -108,6 +109,24 @@ export default function AdminDashboardSummary() {
           </div>
         </div>
       </div>
+      {/* Ringkasan Jumlah Pegawai Terdaftar (Clean Action Banner) */}
+      <Link
+        to="/audit-sistem"
+        className="bg-slate-800/40 hover:bg-slate-800 transition-colors rounded-2xl p-3 border border-slate-800 flex items-center justify-between text-xs relative z-10 block group"
+      >
+        <div className="flex items-center gap-2.5">
+          <div className="w-7 h-7 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
+            <Users size={14} />
+          </div>
+          <div>
+            <span className="text-[10px] text-slate-400 block font-medium">Pegawai & Kontributor</span>
+            <strong className="text-slate-200 font-bold">{DEPARTMENT_USERS.length} Orang Aktif</strong>
+          </div>
+        </div>
+        <span className="text-[11px] font-semibold text-emerald-400 group-hover:translate-x-0.5 transition-transform flex items-center gap-1">
+          Lihat Rekap &rarr;
+        </span>
+      </Link>
     </div>
   );
 }

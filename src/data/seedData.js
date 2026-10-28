@@ -5,6 +5,34 @@ export const ACTIVITY_TYPES = [
   { id: 'dalam_kantor', label: 'Dalam Kantor (Internal)', icon: '🏢' }
 ];
 
+// Daftar Pegawai di Lingkungan Dinas Perikanan
+export const DEPARTMENT_USERS = [
+  {
+    id: 'u-1',
+    name: 'Bayu Pratama, S.Pi.',
+    nip: '19930415 202012 1 002',
+    role: 'Pengawas Perikanan / Pelaksana Teknis',
+    initials: 'BP',
+    division: 'Bidang Perikanan Budidaya & Tangkap'
+  },
+  {
+    id: 'u-2',
+    name: 'Siti Rahmawati, S.Kel.',
+    nip: '19950822 202203 2 001',
+    role: 'Penyuluh Perikanan Lapangan',
+    initials: 'SR',
+    division: 'Seksi Penyuluhan & Pemberdayaan Nelayan'
+  },
+  {
+    id: 'u-3',
+    name: 'Ahmad Fauzi, A.Md.',
+    nip: '19911204 201903 1 003',
+    role: 'Teknisi Laboratorium Kualitas Air',
+    initials: 'AF',
+    division: 'Unit Pelaksana Teknis Laboratorium Hama & Penyakit Ikan'
+  }
+];
+
 export const INITIAL_REPORTS = [
   {
     id: 'LAP-DKP-001',
@@ -46,6 +74,30 @@ export const INITIAL_REPORTS = [
     createdAt: new Date('2026-10-12T10:00:00').toISOString()
   },
   {
+    id: 'LAP-DKP-003',
+    title: 'Pendampingan Sertifikasi Cara Budidaya Ikan Yang Baik (CBIB) di Tambak Udang',
+    activityType: 'luar_kantor',
+    date: '2026-10-11',
+    time: '09:00',
+    reporterName: 'Siti Rahmawati, S.Kel.',
+    reporterNip: '19950822 202203 2 001',
+    location: 'Kawasan Tambak Pesisir Pantai Timur',
+    description: 'Melakukan pendampingan audit CBIB pada 2 kelompok petambak udang vaname. Pemeriksaan meliputi manajemen limbah pakan, biosecurity kawasan, serta pencatatan buku harian tambak.',
+    photo: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80',
+    status: 'reviewed',
+    comments: [
+      {
+        id: 'c-2',
+        author: 'Dr. DEDY PALWADI AP. MM',
+        role: 'Kepala Dinas Perikanan',
+        date: '2026-10-11 14:20',
+        text: 'Siti Rahmawati, laporan pendampingan sangat teliti. Segera proses penerbitan sertifikat CBIB bagi kelompok yang lolos audit.',
+        action: 'approved'
+      }
+    ],
+    createdAt: new Date('2026-10-11T09:00:00').toISOString()
+  },
+  {
     id: 'LAP-DKP-004',
     title: 'Verifikasi Berkas Permohonan Surat Rekomendasi Pembelian BBM Bersubsidi Nelayan',
     activityType: 'dalam_kantor',
@@ -68,5 +120,20 @@ export const INITIAL_REPORTS = [
       }
     ],
     createdAt: new Date('2026-10-09T13:30:00').toISOString()
+  },
+  {
+    id: 'LAP-DKP-005',
+    title: 'Pengujian Sampel Air & Uji Laboratorium Patogen Udang Vaname',
+    activityType: 'dalam_kantor',
+    date: '2026-10-08',
+    time: '11:00',
+    reporterName: 'Ahmad Fauzi, A.Md.',
+    reporterNip: '19911204 201903 1 003',
+    location: 'Laboratorium Pengujian Mutu DKP',
+    description: 'Melaksanakan analisis PCR sampel udang dari petambak Desa Sukamakmur untuk deteksi dini virus WSSV dan IMNV. Hasil pengujian menunjukkan negatif pada 4 sampel kolam yang diuji.',
+    photo: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80',
+    status: 'pending',
+    comments: [],
+    createdAt: new Date('2026-10-08T11:00:00').toISOString()
   }
 ];
