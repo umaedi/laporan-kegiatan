@@ -85,6 +85,13 @@ export function ReportProvider({ children }) {
     );
   };
 
+  // Switch role antara 'pegawai' dan 'admin'
+  const [currentUserRole, setCurrentUserRole] = useState('pegawai'); // 'pegawai' | 'admin'
+
+  const toggleUserRole = () => {
+    setCurrentUserRole(prev => (prev === 'pegawai' ? 'admin' : 'pegawai'));
+  };
+
   // Hapus laporan
   const deleteReport = (reportId) => {
     setReports(prev => prev.filter(r => r.id !== reportId));
@@ -103,6 +110,8 @@ export function ReportProvider({ children }) {
         addSupervisorComment,
         deleteReport,
         resetToDefault,
+        currentUserRole,
+        toggleUserRole,
         todayCount,
         totalCount,
         pendingCount,

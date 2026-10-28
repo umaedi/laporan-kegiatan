@@ -1,9 +1,9 @@
 import React from 'react';
 import { useReports } from '../context/ReportContext';
-import { User, Shield, RefreshCw, CheckCircle2, FileText, Phone, MapPin, Waves, Building2 } from 'lucide-react';
+import { User, Shield, RefreshCw, CheckCircle2, FileText, Phone, MapPin, Waves, Building2, UserCog } from 'lucide-react';
 
 export default function ProfilePage() {
-  const { totalCount, reviewedCount, luarKantorCount, dalamKantorCount, resetToDefault } = useReports();
+  const { totalCount, reviewedCount, luarKantorCount, dalamKantorCount, resetToDefault, currentUserRole, toggleUserRole } = useReports();
 
   const handleReset = () => {
     if (window.confirm('Kembalikan semua data ke contoh awal (data demo Dinas Perikanan)?')) {
@@ -16,18 +16,45 @@ export default function ProfilePage() {
     <div className="flex flex-col flex-1 pb-12 px-5 pt-3">
       {/* Profil Header Card */}
       <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-xs text-center relative overflow-hidden mb-4">
-        <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-emerald-800 to-teal-600 text-white flex items-center justify-center mx-auto text-2xl font-bold shadow-md mb-2">
-          BP
+        <div className={`w-20 h-20 rounded-full bg-gradient-to-tr ${currentUserRole === 'admin' ? 'from-amber-700 to-emerald-700' : 'from-emerald-800 to-teal-600'} text-white flex items-center justify-center mx-auto text-2xl font-bold shadow-md mb-2`}>
+          {currentUserRole === 'admin' ? 'DP' : 'BP'}
         </div>
         <h2 className="text-base font-extrabold text-slate-900">
-          Bayu Pratama, S.Pi.
+          {currentUserRole === 'admin' ? 'Dr. Dedy Palwadi Ap. Mm' : 'Bayu Pratama, S.Pi.'}
         </h2>
         <p className="text-xs text-emerald-700 font-semibold mt-0.5">
-          Pengawas Perikanan / Pelaksana Teknis
+          {currentUserRole === 'admin' ? 'Kepala Dinas Perikanan (Administrator)' : 'Pengawas Perikanan / Pelaksana Teknis'}
         </p>
         <span className="inline-block mt-2 text-[10px] bg-slate-100 text-slate-600 px-2.5 py-0.5 rounded-full font-mono">
-          NIP: 19930415 202012 1 002
+          {currentUserRole === 'admin' ? 'NIP: 19720819 199803 1 005' : 'NIP: 19930415 202012 1 002'}
         </span>
+
+        {/* Panel Switch Role Admin / Pegawai */}
+        <div className="mt-4 p-3 bg-slate-50 rounded-xl border border-slate-200 text-left">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+              <UserCog size={15} className="text-emerald-700" />
+              Simulasi Ganti Role Akses
+            </span>
+            <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${currentUserRole === 'admin' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}`}>
+              {currentUserRole === 'admin' ? 'Role: ADMIN' : 'Role: PEGAWAI'}
+            </span>
+          </div>
+          <p className="text-[11px] text-slate-500 mb-2.5">
+            Ubah mode untuk menguji tampilan & fitur sebagai Pegawai (buat laporan) atau Admin/Atasan (verifikasi & beri komentar).
+          </p>
+          <button
+            onClick={toggleUserRole}
+            className={`w-full py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-colors shadow-sm ${
+              currentUserRole === 'admin'
+                ? 'bg-emerald-700 hover:bg-emerald-800 text-white'
+                : 'bg-amber-600 hover:bg-amber-700 text-white'
+            }`}
+          >
+            <Shield size={14} />
+            {currentUserRole === 'admin' ? 'Beralih ke Mode Pegawai' : 'Beralih ke Mode Admin (Kepala Dinas)'}
+          </button>
+        </div>
 
         {/* Statistik Pelaporan Pegawai */}
         <div className="grid grid-cols-2 gap-2 mt-4 pt-4 border-t border-slate-100 text-left text-xs">
