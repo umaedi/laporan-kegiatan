@@ -2,33 +2,50 @@ import React, { useState } from 'react';
 import { useReports } from '../context/ReportContext';
 import { DEPARTMENT_USERS } from '../data/seedData';
 import ReportCard from '../components/report/ReportCard';
-import { Users, FileCheck, ArrowLeft, Download, CheckCircle2 } from 'lucide-react';
+import { Users, FileCheck, ArrowLeft, Download, CheckCircle2, Waves, Building2, Calendar, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export default function AdminAuditPage() {
-  const { reports, totalCount, reviewedCount } = useReports();
+  const { reports, totalCount, reviewedCount, luarKantorCount, dalamKantorCount } = useReports();
   const navigate = useNavigate();
 
-  const [activeFilter, setActiveFilter] = useState('all'); // 'all' | 'pending' | 'reviewed' | 'revision'
+  const [activeFilter, setActiveFilter] = useState('all'); // 'all' | 'pending' | 'reviewed' | 'revision' | 'luar_kantor' | 'dalam_kantor'
+  const [selectedDate, setSelectedDate] = useState(''); // YYYY-MM-DD
 
-  const revisionReports = reports.filter(r => r.status === 'revision');
-  const pendingReports = reports.filter(r => r.status === 'pending' || !r.comments || r.comments.length === 0);
-  const reviewedReports = reports.filter(r => r.status === 'reviewed' && r.comments && r.comments.length > 0);
+  // Filter laporan berdasarkan tanggal terlebih dahulu jika dipilih
+  const dateFilteredReports = selectedDate
+    ? reports.filter(r => r.date === selectedDate)
+    : reports;
+
+  const revisionReports = dateFilteredReports.filter(r => r.status === 'revision');
+  const pendingReports = dateFilteredReports.filter(r => r.status === 'pending' || !r.comments || r.comments.length === 0);
+  const reviewedReports = dateFilteredReports.filter(r => r.status === 'reviewed' && r.comments && r.comments.length > 0);
+  const luarKantorReports = dateFilteredReports.filter(r => r.activityType === 'luar_kantor');
+  const dalamKantorReports = dateFilteredReports.filter(r => r.activityType === 'dalam_kantor');
+
+  const currentTotalCount = dateFilteredReports.length;
+  const currentLuarCount = luarKantorReports.length;
+  const currentDalamCount = dalamKantorReports.length;
+  const currentPendingCount = pendingReports.length;
+  const currentReviewedCount = reviewedReports.length;
 
   const getFilteredReports = () => {
     if (activeFilter === 'pending') return pendingReports;
     if (activeFilter === 'reviewed') return reviewedReports;
     if (activeFilter === 'revision') return revisionReports;
-    return reports;
+    if (activeFilter === 'luar_kantor') return luarKantorReports;
+    if (activeFilter === 'dalam_kantor') return dalamKantorReports;
+    return dateFilteredReports;
   };
 
   const displayedReports = getFilteredReports();
 
   const handleExportData = () => {
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(reports, null, 2));
+    const dataToExport = selectedDate ? dateFilteredReports : reports;
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataToExport, null, 2));
     const downloadAnchor = document.createElement('a');
     downloadAnchor.setAttribute("href", dataStr);
-    downloadAnchor.setAttribute("download", `laporan_audit_dinas_perikanan_${new Date().toISOString().split('T')[0]}.json`);
+    downloadAnchor.setAttribute("download", `laporan_audit_dinas_perikanan_${selectedDate || 'semua'}_${new Date().toISOString().split('T')[0]}.json`);
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
@@ -65,8 +82,79 @@ export default function AdminAuditPage() {
           Ekspor
         </button>
       </div>
+      {/* Filter Tanggal */}
+      <div className="bg-white rounded-2xl p-3 border border-slate-100 shadow-xs mb-3 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2 flex-1">
+          <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
+            <Calendar size={16} />
+          </div>
+          <div className="flex-1">
+            <label className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block">Filter Berdasarkan Tanggal</label>
+            <input
+              type="date"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              className="text-xs font-bold text-slate-800 bg-transparent focus:outline-none w-full cursor-pointer"
+            />
+          </div>
+        </div>
+
+        {selectedDate && (
+          <button
+            type="button"
+            onClick={() => setSelectedDate('')}
+            className="flex items-center gap-1 text-[11px] font-bold text-red-600 bg-red-50 hover:bg-red-100 px-2.5 py-1.5 rounded-xl transition-colors cursor-pointer"
+            title="Reset Filter Tanggal"
+          >
+            <X size={14} />
+            <span>Reset</span>
+          </button>
+        )}
+      </div>
 
       {/* Ringkasan Status Audit */}
+      {/* Ringkasan Jenis Kegiatan (Lapangan vs Internal) */}
+      <div className="grid grid-cols-2 gap-2 mb-4">
+        <button
+          type="button"
+          onClick={() => setActiveFilter('luar_kantor')}
+          className={`p-3 rounded-2xl border text-left flex items-center justify-between transition-all cursor-pointer ${
+            activeFilter === 'luar_kantor'
+              ? 'bg-blue-900 text-white border-blue-900 shadow-md'
+              : 'bg-white text-slate-800 border-slate-100 hover:bg-slate-50'
+          }`}
+        >
+          <div>
+            <div className="flex items-center gap-1 mb-0.5">
+              <span className={`text-[10px] font-semibold ${activeFilter === 'luar_kantor' ? 'text-blue-100' : 'text-slate-500'}`}>Lapangan</span>
+            </div>
+            <strong className="text-base font-black">{luarKantorCount} Kegiatan</strong>
+          </div>
+          <span className={`text-xs font-bold px-2 py-1 rounded-xl ${activeFilter === 'luar_kantor' ? 'bg-blue-800 text-white' : 'bg-blue-50 text-blue-700'}`}>
+            {Math.round((luarKantorCount / (totalCount || 1)) * 100)}%
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveFilter('dalam_kantor')}
+          className={`p-3 rounded-2xl border text-left flex items-center justify-between transition-all cursor-pointer ${
+            activeFilter === 'dalam_kantor'
+              ? 'bg-emerald-900 text-white border-emerald-900 shadow-md'
+              : 'bg-white text-slate-800 border-slate-100 hover:bg-slate-50'
+          }`}
+        >
+          <div>
+            <div className="flex items-center gap-1 mb-0.5">
+              <span className={`text-[10px] font-semibold ${activeFilter === 'dalam_kantor' ? 'text-emerald-100' : 'text-slate-500'}`}>Internal</span>
+            </div>
+            <strong className="text-base font-black">{dalamKantorCount} Kegiatan</strong>
+          </div>
+          <span className={`text-xs font-bold px-2 py-1 rounded-xl ${activeFilter === 'dalam_kantor' ? 'bg-emerald-800 text-white' : 'bg-emerald-50 text-emerald-700'}`}>
+            {Math.round((dalamKantorCount / (totalCount || 1)) * 100)}%
+          </span>
+        </button>
+      </div>
       <div className="grid grid-cols-3 gap-2 mb-4">
         <button
           type="button"
@@ -116,7 +204,7 @@ export default function AdminAuditPage() {
           </h3>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-2 max-h-[220px] overflow-y-auto pr-1">
           {DEPARTMENT_USERS.map(user => {
             const userReports = reports.filter(r => r.reporterName === user.name);
             const userReviewed = userReports.filter(r => r.status === 'reviewed').length;
