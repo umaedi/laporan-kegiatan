@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { useReports } from '../context/ReportContext';
-import { DEPARTMENT_USERS } from '../data/seedData';
-import ReportCard from '../components/report/ReportCard';
+import { useReports } from '../../context/ReportContext';
+import { DEPARTMENT_USERS } from '../../data/seedData';
+import ReportCard from '../../components/report/ReportCard';
 import { Users, FileCheck, ArrowLeft, Download, CheckCircle2, Waves, Building2, Calendar, X, Eye } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 

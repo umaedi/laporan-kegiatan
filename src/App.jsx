@@ -8,7 +8,7 @@ import CreateReportPage from './pages/CreateReportPage';
 import ReportDetailPage from './pages/ReportDetailPage';
 import AppreciationPage from './pages/AppreciationPage';
 import ProfilePage from './pages/ProfilePage';
-import AdminAuditPage from './pages/AdminAuditPage';
+import AdminAuditPage from './pages/admin/AdminAuditPage';
 
 export default function App() {
   return (
