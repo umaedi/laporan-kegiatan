@@ -65,10 +65,10 @@ export default function AdminAuditPage() {
           </button>
           <div>
             <h2 className="text-lg font-extrabold text-slate-900 tracking-tight">
-              Audit & Verifikasi Pimpinan
+              Audit
             </h2>
             <p className="text-[11px] text-slate-500">
-              Pusat Kendali & Peninjauan Kinerja Pegawai
+              Peninjauan Kinerja Pegawai
             </p>
           </div>
         </div>
