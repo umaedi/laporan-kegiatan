@@ -85,11 +85,39 @@ export function ReportProvider({ children }) {
     );
   };
 
-  // Switch role antara 'pegawai' dan 'admin'
-  const [currentUserRole, setCurrentUserRole] = useState('pegawai'); // 'pegawai' | 'admin'
+  // Status user login (bisa simpan user object atau role)
+  const [currentUser, setCurrentUser] = useState(() => {
+    return {
+      name: 'Bayu Pratama, S.Pi.',
+      nip: '19930415 202012 1 002',
+      role: 'Pengawas Perikanan / Pelaksana Teknis',
+      initials: 'BP',
+      type: 'pegawai'
+    };
+  });
+
+  const currentUserRole = currentUser?.type === 'admin' ? 'admin' : 'pegawai';
 
   const toggleUserRole = () => {
-    setCurrentUserRole(prev => (prev === 'pegawai' ? 'admin' : 'pegawai'));
+    setCurrentUser(prev => {
+      if (prev?.type === 'admin') {
+        return {
+          name: 'Bayu Pratama, S.Pi.',
+          nip: '19930415 202012 1 002',
+          role: 'Pengawas Perikanan / Pelaksana Teknis',
+          initials: 'BP',
+          type: 'pegawai'
+        };
+      } else {
+        return {
+          name: 'Dr. Dedy Palwadi Ap. Mm',
+          nip: '19720819 199803 1 005',
+          role: 'Kepala Dinas Perikanan',
+          initials: 'DP',
+          type: 'admin'
+        };
+      }
+    });
   };
 
   // Hapus laporan
@@ -110,6 +138,8 @@ export function ReportProvider({ children }) {
         addSupervisorComment,
         deleteReport,
         resetToDefault,
+        currentUser,
+        setCurrentUser,
         currentUserRole,
         toggleUserRole,
         todayCount,

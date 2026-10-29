@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useReports } from '../../context/ReportContext';
 import { DEPARTMENT_USERS } from '../../data/seedData';
 import ReportCard from '../../components/report/ReportCard';
+import AuditChartSection from '../../components/admin/AuditChartSection';
 import { Users, FileCheck, ArrowLeft, Download, CheckCircle2, Waves, Building2, Calendar, X, Eye } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -9,10 +10,9 @@ export default function AdminAuditPage() {
   const { reports, totalCount, reviewedCount, luarKantorCount, dalamKantorCount } = useReports();
   const navigate = useNavigate();
 
-  const [activeFilter, setActiveFilter] = useState('all'); // 'all' | 'pending' | 'reviewed' | 'revision' | 'luar_kantor' | 'dalam_kantor'
-  const [selectedDate, setSelectedDate] = useState(''); // YYYY-MM-DD
+  const [activeFilter, setActiveFilter] = useState('all');
+  const [selectedDate, setSelectedDate] = useState('');
 
-  // Filter laporan berdasarkan tanggal terlebih dahulu jika dipilih
   const dateFilteredReports = selectedDate
     ? reports.filter(r => r.date === selectedDate)
     : reports;
@@ -59,27 +59,28 @@ export default function AdminAuditPage() {
           <button
             type="button"
             onClick={() => navigate('/')}
-            className="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-700 transition-colors"
+            className="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-700 transition-colors cursor-pointer"
           >
             <ArrowLeft size={18} />
           </button>
           <div>
             <h2 className="text-lg font-extrabold text-slate-900 tracking-tight">
-              Audit
+              Audit Sistem
             </h2>
-            <p className="text-[11px] text-slate-500">
-              Peninjauan Kinerja Pegawai
+            <p className="text-[11px] text-slate-500 font-medium">
+              Peninjauan Kinerja Pegawai Dinas Perikanan
             </p>
           </div>
         </div>
 
         <button
+          type="button"
           onClick={handleExportData}
-          className="flex items-center gap-1.5 px-3 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold shadow-sm transition-colors"
-          title="Ekspor Laporan"
+          className="flex items-center gap-1.5 px-3 py-2 bg-emerald-800 hover:bg-emerald-900 text-white rounded-xl text-xs font-bold shadow-sm transition-colors cursor-pointer"
+          title="Ekspor Laporan Audit"
         >
           <Download size={14} />
-          Ekspor
+          <span>Ekspor</span>
         </button>
       </div>
       {/* Filter Tanggal */}
@@ -155,18 +156,18 @@ export default function AdminAuditPage() {
           </span>
         </button>
       </div>
-      <div className="grid grid-cols-3 gap-2 mb-4">
+      <div className="grid grid-cols-3 gap-2 mb-3">
         <button
           type="button"
           onClick={() => setActiveFilter('all')}
           className={`p-3 rounded-2xl border text-center transition-all cursor-pointer ${
             activeFilter === 'all'
-              ? 'bg-slate-900 text-white border-slate-900 shadow-md'
+              ? 'bg-emerald-800 text-white border-emerald-800 shadow-md ring-2 ring-emerald-600/30'
               : 'bg-white text-slate-800 border-slate-100 hover:bg-slate-50'
           }`}
         >
-          <span className={`text-[10px] block font-medium ${activeFilter === 'all' ? 'text-slate-300' : 'text-slate-400'}`}>Total Arsip</span>
-          <strong className="text-lg font-black">{totalCount}</strong>
+          <span className={`text-[10px] block font-bold ${activeFilter === 'all' ? 'text-emerald-100' : 'text-slate-400'}`}>Total Arsip</span>
+          <strong className="text-lg font-black">{currentTotalCount}</strong>
         </button>
 
         <button
@@ -174,12 +175,12 @@ export default function AdminAuditPage() {
           onClick={() => setActiveFilter('pending')}
           className={`p-3 rounded-2xl border text-center transition-all cursor-pointer ${
             activeFilter === 'pending'
-              ? 'bg-amber-600 text-white border-amber-600 shadow-md'
+              ? 'bg-amber-600 text-white border-amber-600 shadow-md ring-2 ring-amber-500/30'
               : 'bg-amber-50 text-amber-900 border-amber-100 hover:bg-amber-100/70'
           }`}
         >
-          <span className={`text-[10px] block font-medium ${activeFilter === 'pending' ? 'text-amber-100' : 'text-amber-600'}`}>Pending Review</span>
-          <strong className="text-lg font-black">{pendingReports.length}</strong>
+          <span className={`text-[10px] block font-bold ${activeFilter === 'pending' ? 'text-amber-100' : 'text-amber-600'}`}>Pending Review</span>
+          <strong className="text-lg font-black">{currentPendingCount}</strong>
         </button>
 
         <button
@@ -187,14 +188,18 @@ export default function AdminAuditPage() {
           onClick={() => setActiveFilter('reviewed')}
           className={`p-3 rounded-2xl border text-center transition-all cursor-pointer ${
             activeFilter === 'reviewed'
-              ? 'bg-emerald-700 text-white border-emerald-700 shadow-md'
+              ? 'bg-emerald-700 text-white border-emerald-700 shadow-md ring-2 ring-emerald-500/30'
               : 'bg-emerald-50 text-emerald-900 border-emerald-100 hover:bg-emerald-100/70'
           }`}
         >
-          <span className={`text-[10px] block font-medium ${activeFilter === 'reviewed' ? 'text-emerald-100' : 'text-emerald-600'}`}>Disetujui</span>
-          <strong className="text-lg font-black">{reviewedCount}</strong>
+          <span className={`text-[10px] block font-bold ${activeFilter === 'reviewed' ? 'text-emerald-100' : 'text-emerald-600'}`}>Disetujui</span>
+          <strong className="text-lg font-black">{currentReviewedCount}</strong>
         </button>
       </div>
+
+      {/* Seksion Grafik Analitik Visual */}
+      <AuditChartSection reports={dateFilteredReports} />
+
       {/* Seksion 1: Daftar Pegawai & Aktivitas */}
       <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-xs mb-4 space-y-3">
         <div className="flex items-center justify-between">
@@ -212,26 +217,25 @@ export default function AdminAuditPage() {
             const userDalam = userReports.filter(r => r.activityType === 'dalam_kantor').length;
 
             return (
-              <div key={user.id} className="p-3 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between text-xs">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-full bg-emerald-700 text-white font-bold flex items-center justify-center text-xs shadow-xs">
+              <div key={user.id} className="p-2.5 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between gap-3 text-xs">
+                <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                  <div className="w-7 h-7 rounded-full bg-emerald-700 text-white font-bold flex items-center justify-center text-[10px] shadow-xs shrink-0">
                     {user.initials}
                   </div>
-                  <div>
-                    <h4 className="font-bold text-slate-800">{user.name}</h4>
-                    <p className="text-[10px] text-slate-500">{user.role}</p>
-                    <div className="flex items-center gap-2 mt-1 text-[10px] text-slate-500 font-medium">
-                      <span className="flex items-center gap-0.5 text-blue-700">
+                  <div className="min-w-0 flex-1">
+                    <h4 className="font-bold text-slate-800 truncate text-xs">{user.name}</h4>
+                    <div className="flex items-center gap-2 text-[10px] text-slate-500 font-medium">
+                      <span className="flex items-center gap-0.5 text-emerald-700 shrink-0">
                         <Waves size={10} /> {userLuar} Lapangan
                       </span>
                       <span>•</span>
-                      <span className="flex items-center gap-0.5 text-emerald-700">
+                      <span className="flex items-center gap-0.5 text-emerald-800 shrink-0">
                         <Building2 size={10} /> {userDalam} Internal
                       </span>
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2.5 shrink-0">
                   <div className="text-right">
                     <span className="font-bold text-emerald-800 text-xs block">{userReports.length} Total</span>
                     <span className="text-[10px] text-slate-400">{userReviewed} disetujui</span>
@@ -239,10 +243,10 @@ export default function AdminAuditPage() {
                   <button
                     type="button"
                     onClick={() => navigate(`/profil?user=${encodeURIComponent(user.name)}`)}
-                    className="p-2 rounded-xl bg-emerald-100 hover:bg-emerald-200 text-emerald-800 transition-colors cursor-pointer"
+                    className="p-1.5 rounded-lg bg-emerald-100 hover:bg-emerald-200 text-emerald-800 transition-colors cursor-pointer"
                     title={`Lihat Profil ${user.name}`}
                   >
-                    <Eye size={14} />
+                    <Eye size={13} />
                   </button>
                 </div>
               </div>

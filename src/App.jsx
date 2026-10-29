@@ -9,13 +9,15 @@ import ReportDetailPage from './pages/ReportDetailPage';
 import AppreciationPage from './pages/AppreciationPage';
 import ProfilePage from './pages/ProfilePage';
 import AdminAuditPage from './pages/admin/AdminAuditPage';
+import LoginPage from './pages/LoginPage';
 
 export default function App() {
   return (
     <ReportProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<MobileAppShell />}>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/*" element={<MobileAppShell />}>
             <Route index element={<HomePage />} />
             <Route path="kegiatan" element={<ReportListPage />} />
             <Route path="buat-laporan" element={<CreateReportPage />} />

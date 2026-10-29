@@ -1,9 +1,11 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useReports } from '../context/ReportContext';
-import { User, Shield, RefreshCw, CheckCircle2, FileText, Phone, MapPin, Waves, Building2, UserCog } from 'lucide-react';
+import { User, Shield, RefreshCw, CheckCircle2, FileText, Phone, MapPin, Waves, Building2, UserCog, LogOut } from 'lucide-react';
 
 export default function ProfilePage() {
   const { totalCount, reviewedCount, luarKantorCount, dalamKantorCount, resetToDefault, currentUserRole, toggleUserRole } = useReports();
+  const navigate = useNavigate();
 
   const handleReset = () => {
     if (window.confirm('Kembalikan semua data ke contoh awal (data demo Dinas Perikanan)?')) {
@@ -53,6 +55,15 @@ export default function ProfilePage() {
           >
             <Shield size={14} />
             {currentUserRole === 'admin' ? 'Beralih ke Mode Pegawai' : 'Beralih ke Mode Admin (Kepala Dinas)'}
+          </button>
+
+          {/* Tombol Logout ke Halaman Login */}
+          <button
+            onClick={() => navigate('/login')}
+            className="w-full mt-2.5 py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 bg-red-50 hover:bg-red-100 text-red-700 transition-colors cursor-pointer border border-red-200"
+          >
+            <LogOut size={14} />
+            <span>Keluar / Ganti Akun (Logout)</span>
           </button>
         </div>
 
