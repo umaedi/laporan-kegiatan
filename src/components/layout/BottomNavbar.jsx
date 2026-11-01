@@ -1,94 +1,47 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, Layers, Award, User, Camera } from 'lucide-react';
+import { Home, Camera, Award, User } from 'lucide-react';
 
-export default function BottomNavbar() {
+const NAV_ITEMS = [
+  { to: '/', label: 'Beranda', icon: Home, end: true },
+  { to: '/buat-laporan', label: 'Buat Kegiatan', icon: Camera },
+  { to: '/apresiasi', label: 'Apresiasi', icon: Award },
+  { to: '/profil', label: 'Profil', icon: User }
+];
+
+// `items` bisa diganti, misalnya untuk navigasi Panel Admin
+export default function BottomNavbar({ items = NAV_ITEMS }) {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 max-w-md mx-auto z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 shadow-sm">
-      <div className="flex items-center justify-between px-3 py-2 relative">
-        {/* Tab 1: Beranda */}
-        <NavLink
-          to="/"
-          className={({ isActive }) =>
-            `flex flex-col items-center flex-1 py-1 transition-colors ${
-              isActive ? 'text-emerald-700 font-semibold' : 'text-slate-400 hover:text-slate-600'
-            }`
-          }
-        >
-          {({ isActive }) => (
-            <>
-              <Home size={22} strokeWidth={isActive ? 2.5 : 2} />
-              <span className="text-[11px] mt-1">Beranda</span>
-              {isActive && <span className="w-5 h-0.5 bg-emerald-700 rounded-full mt-0.5"></span>}
-            </>
-          )}
-        </NavLink>
-
-        {/* Tab 2: Kegiatan */}
-        <NavLink
-          to="/kegiatan"
-          className={({ isActive }) =>
-            `flex flex-col items-center flex-1 py-1 transition-colors ${
-              isActive ? 'text-emerald-700 font-semibold' : 'text-slate-400 hover:text-slate-600'
-            }`
-          }
-        >
-          {({ isActive }) => (
-            <>
-              <Layers size={22} strokeWidth={isActive ? 2.5 : 2} />
-              <span className="text-[11px] mt-1">Kegiatan</span>
-              {isActive && <span className="w-5 h-0.5 bg-emerald-700 rounded-full mt-0.5"></span>}
-            </>
-          )}
-        </NavLink>
-
-        {/* Tab 3 / Center Elevated FAB: Buat Laporan / Foto */}
-        <div className="flex-1 flex justify-center">
+    // Navigasi mengambang: menempel di bawah layar dengan jarak kanan, kiri, dan bawah
+    <div className="fixed bottom-0 inset-x-0 max-w-md mx-auto z-40 px-4 pb-[calc(env(safe-area-inset-bottom)+12px)] pointer-events-none">
+      <nav className="pointer-events-auto grid grid-cols-4 items-center h-16 px-2 rounded-2xl bg-white/95 backdrop-blur-md border border-slate-200 shadow-lg">
+        {items.map(({ to, label, icon: Icon, end, badge }) => (
           <NavLink
-            to="/buat-laporan"
-            className="group relative flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-tr from-emerald-800 to-emerald-600 text-white shadow-lg fab-glow ring-4 ring-white hover:scale-105 active:scale-95 transition-all duration-200"
-            title="Buat Laporan Baru"
+            key={to}
+            to={to}
+            end={end}
+            className={({ isActive }) =>
+              `flex flex-col items-center justify-center h-full rounded-xl transition-colors ${
+                isActive ? 'text-emerald-700 font-semibold' : 'text-slate-500 hover:text-slate-700'
+              }`
+            }
           >
-            <Camera size={26} className="text-white group-hover:scale-110 transition-transform" />
+            {({ isActive }) => (
+              <>
+                <span className="relative">
+                  <Icon size={22} strokeWidth={isActive ? 2.5 : 2} />
+                  {badge > 0 && (
+                    <span className="absolute -top-1.5 -right-2.5 min-w-[18px] h-[18px] px-1 rounded-full bg-amber-500 text-white text-[11px] font-bold leading-[18px] text-center">
+                      {badge > 9 ? '9+' : badge}
+                    </span>
+                  )}
+                </span>
+                <span className="text-xs mt-1 whitespace-nowrap">{label}</span>
+              </>
+            )}
           </NavLink>
-        </div>
-
-        {/* Tab 4: Apresiasi (Menggantikan Atasan) */}
-        <NavLink
-          to="/apresiasi"
-          className={({ isActive }) =>
-            `flex flex-col items-center flex-1 py-1 transition-colors ${
-              isActive ? 'text-emerald-700 font-semibold' : 'text-slate-400 hover:text-slate-600'
-            }`
-          }
-        >
-          {({ isActive }) => (
-            <>
-              <Award size={22} strokeWidth={isActive ? 2.5 : 2} />
-              <span className="text-[11px] mt-1">Apresiasi</span>
-              {isActive && <span className="w-5 h-0.5 bg-emerald-700 rounded-full mt-0.5"></span>}
-            </>
-          )}
-        </NavLink>
-
-        {/* Tab 5: Profil */}
-        <NavLink
-          to="/profil"
-          className={({ isActive }) =>
-            `flex flex-col items-center flex-1 py-1 transition-colors ${
-              isActive ? 'text-emerald-700 font-semibold' : 'text-slate-400 hover:text-slate-600'
-            }`
-          }
-        >
-          {({ isActive }) => (
-            <>
-              <User size={22} strokeWidth={isActive ? 2.5 : 2} />
-              <span className="text-[11px] mt-1">Profil</span>
-              {isActive && <span className="w-5 h-0.5 bg-emerald-700 rounded-full mt-0.5"></span>}
-            </>
-          )}
-        </NavLink>
-      </div>
-    </nav>
+        ))}
+      </nav>
+    </div>
   );
 }

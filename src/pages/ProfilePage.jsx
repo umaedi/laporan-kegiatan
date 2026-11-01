@@ -1,107 +1,113 @@
 import React from 'react';
-import { useReports } from '../context/ReportContext';
-import { User, Shield, RefreshCw, CheckCircle2, FileText, Phone, MapPin, Waves, Building2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Copy, Lock, LayoutDashboard, ChevronRight, LogOut, ImageOff } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { useFeed } from '../hooks/useReports';
+import { ROLE, VISIBILITY } from '../shared/enums';
+import { getInitials } from '../lib/user';
+import LoadingState from '../components/ui/LoadingState';
+import ErrorState from '../components/ui/ErrorState';
+import LoadMore from '../components/ui/LoadMore';
+import AuthImage from '../components/ui/AuthImage';
 
 export default function ProfilePage() {
-  const { totalCount, reviewedCount, luarKantorCount, dalamKantorCount, resetToDefault } = useReports();
+  const { user, logout } = useAuth();
+  const { data, isPending, isError, error, refetch, hasNextPage, isFetchingNextPage, fetchNextPage } = useFeed('saya');
 
-  const handleReset = () => {
-    if (window.confirm('Kembalikan semua data ke contoh awal (data demo Dinas Perikanan)?')) {
-      resetToDefault();
-      alert('Data berhasil direset ke contoh awal Dinas Perikanan!');
-    }
-  };
+  const reports = data?.pages.flatMap(page => page.items) ?? [];
+  const total = data?.pages[0]?.meta.total ?? 0;
 
   return (
-    <div className="flex flex-col flex-1 pb-12 px-5 pt-3">
-      {/* Profil Header Card */}
-      <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-xs text-center relative overflow-hidden mb-4">
-        <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-emerald-800 to-teal-600 text-white flex items-center justify-center mx-auto text-2xl font-bold shadow-md mb-2">
-          BP
-        </div>
-        <h2 className="text-base font-extrabold text-slate-900">
-          Bayu Pratama, S.Pi.
-        </h2>
-        <p className="text-xs text-emerald-700 font-semibold mt-0.5">
-          Pengawas Perikanan / Pelaksana Teknis
-        </p>
-        <span className="inline-block mt-2 text-[10px] bg-slate-100 text-slate-600 px-2.5 py-0.5 rounded-full font-mono">
-          NIP: 19930415 202012 1 002
-        </span>
-
-        {/* Statistik Pelaporan Pegawai */}
-        <div className="grid grid-cols-2 gap-2 mt-4 pt-4 border-t border-slate-100 text-left text-xs">
-          <div className="p-2.5 bg-slate-50 rounded-xl">
-            <span className="text-[10px] text-slate-400 block font-medium">Total Laporan</span>
-            <span className="text-base font-bold text-slate-800">{totalCount} Kegiatan</span>
+    <div className="flex flex-col flex-1 pb-12">
+      {/* Identitas pegawai */}
+      <div className="px-4 pt-5 pb-4 border-b border-slate-200">
+        <div className="flex items-center gap-4">
+          <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-emerald-800 to-teal-600 text-white flex items-center justify-center text-2xl font-bold shadow-md shrink-0">
+            {getInitials(user.nama)}
           </div>
-          <div className="p-2.5 bg-emerald-50 rounded-xl">
-            <span className="text-[10px] text-emerald-600 block font-medium">Disetujui Atasan</span>
-            <span className="text-base font-bold text-emerald-800">{reviewedCount} Laporan</span>
+          <div className="min-w-0">
+            <h2 className="text-base font-extrabold text-slate-900 truncate">{user.nama}</h2>
+            {user.jabatan && <p className="text-sm text-emerald-700 font-semibold truncate">{user.jabatan}</p>}
+            {user.nip && <p className="text-xs text-slate-500 font-mono mt-0.5">NIP {user.nip}</p>}
           </div>
         </div>
 
-        {/* Breakdown Luar vs Dalam Kantor */}
-        <div className="grid grid-cols-2 gap-2 mt-2 text-left text-xs">
-          <div className="p-2 bg-emerald-50/60 rounded-xl border border-emerald-100 flex items-center gap-1.5">
-            <Waves size={14} className="text-emerald-700 shrink-0" />
-            <div>
-              <span className="text-[10px] text-slate-500 block leading-tight">Luar Kantor</span>
-              <strong className="text-xs text-emerald-800">{luarKantorCount} Kegiatan</strong>
-            </div>
+        <div className="grid grid-cols-2 gap-2 mt-4 text-sm">
+          <div className="p-3 bg-slate-50 rounded-xl">
+            <span className="text-xs text-slate-500 block">Total Laporan</span>
+            <span className="text-lg font-bold text-slate-900">{isPending ? '…' : total}</span>
           </div>
-          <div className="p-2 bg-blue-50/60 rounded-xl border border-blue-100 flex items-center gap-1.5">
-            <Building2 size={14} className="text-blue-700 shrink-0" />
-            <div>
-              <span className="text-[10px] text-slate-500 block leading-tight">Dalam Kantor</span>
-              <strong className="text-xs text-blue-800">{dalamKantorCount} Kegiatan</strong>
-            </div>
+          <div className="p-3 bg-slate-50 rounded-xl min-w-0">
+            <span className="text-xs text-slate-500 block">OPD</span>
+            <span className="text-sm font-bold text-slate-900 line-clamp-2">{user.opd?.nama_opd ?? '-'}</span>
           </div>
         </div>
+
+        {user.kepala_opd && user.role !== ROLE.KEPALA_OPD && (
+          <p className="text-sm text-slate-600 mt-3">
+            Kepala OPD: <span className="font-semibold text-emerald-800">{user.kepala_opd.nama}</span>
+          </p>
+        )}
+
+        {/* Akses Panel Kepala Dinas: hanya untuk Kepala Dinas */}
+        {user.role === ROLE.KEPALA_OPD && (
+          <Link
+            to="/admin"
+            className="flex items-center gap-3 bg-emerald-900 text-white rounded-2xl p-4 mt-4 hover:bg-emerald-950 transition-colors"
+          >
+            <LayoutDashboard size={22} className="text-emerald-200 shrink-0" />
+            <div className="flex-1">
+              <p className="text-sm font-bold">Panel Kepala Dinas</p>
+              <p className="text-xs text-emerald-200">Tinjau, nilai, dan rekap laporan pegawai</p>
+            </div>
+            <ChevronRight size={20} className="text-emerald-200 shrink-0" />
+          </Link>
+        )}
       </div>
 
-      {/* Detail Unit Kerja Dinas Perikanan */}
-      <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-xs space-y-2 mb-4 text-xs">
-        <h3 className="font-bold text-slate-900 mb-1">Informasi Unit Kerja Pegawai</h3>
+      {/* Grid laporan saya ala Instagram */}
+      {isPending ? (
+        <LoadingState label="Memuat laporan Anda…" />
+      ) : isError ? (
+        <ErrorState error={error} onRetry={refetch} />
+      ) : reports.length === 0 ? (
+        <p className="text-sm text-slate-500 text-center py-12">Anda belum membuat laporan kegiatan.</p>
+      ) : (
+        <>
+          <div className="grid grid-cols-3 gap-0.5 mt-0.5">
+            {reports.map(report => {
+              const cover = report.photos[0];
+              return (
+                <Link key={report.id} to={`/kegiatan/${report.id}`} className="relative aspect-square bg-slate-100" aria-label={report.title}>
+                  {cover ? (
+                    <AuthImage src={cover.url} alt={report.title} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-slate-400">
+                      <ImageOff size={20} />
+                    </div>
+                  )}
+                  <span className="absolute top-1.5 right-1.5 flex gap-1 text-white drop-shadow">
+                    {report.photos.length > 1 && <Copy size={14} aria-label="Beberapa foto" />}
+                    {report.visibility === VISIBILITY.PRIVATE && <Lock size={14} aria-label="Hanya Kepala Dinas" />}
+                  </span>
+                </Link>
+              );
+            })}
+          </div>
+          <LoadMore hasNextPage={hasNextPage} isFetchingNextPage={isFetchingNextPage} fetchNextPage={fetchNextPage} />
+        </>
+      )}
 
-        <div className="flex items-center justify-between py-1.5 dotted-divider">
-          <span className="text-slate-400 font-medium">Instansi</span>
-          <span className="font-bold text-slate-800">Dinas Kelautan dan Perikanan</span>
-        </div>
-
-        <div className="flex items-center justify-between py-1.5 dotted-divider">
-          <span className="text-slate-400 font-medium">Bidang Tugas</span>
-          <span className="font-bold text-slate-800">Bidang Perikanan Budidaya & Tangkap</span>
-        </div>
-
-        <div className="flex items-center justify-between py-1.5 dotted-divider">
-          <span className="text-slate-400 font-medium">Wilayah Pantauan</span>
-          <span className="font-bold text-slate-800">Sentra Tambak & Pesisir Dermaga TPI</span>
-        </div>
-
-        <div className="flex items-center justify-between py-1.5 dotted-divider">
-          <span className="text-slate-400 font-medium">Kepala Dinas</span>
-          <span className="font-bold text-emerald-800">Dr. DEDY PALWADI AP. MM</span>
-        </div>
-      </div>
-
-      {/* Reset Data Demo */}
-      <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-xs text-xs space-y-2">
-        <h3 className="font-bold text-slate-900">Pengaturan Data & Sampel</h3>
-        <p className="text-[11px] text-slate-500">
-          Kembalikan data ke contoh awal kegiatan Dinas Perikanan (data simulasi).
-        </p>
+      <div className="px-4 mt-6">
         <button
-          onClick={handleReset}
-          className="w-full py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-red-50 hover:text-red-700 text-slate-700 font-bold flex items-center justify-center gap-1.5 transition-colors border border-slate-200"
+          type="button"
+          onClick={logout}
+          className="w-full h-11 rounded-xl border border-slate-200 bg-white text-sm font-semibold text-slate-700 hover:bg-slate-50 flex items-center justify-center gap-2 transition-colors"
         >
-          <RefreshCw size={14} />
-          Reset Data Contoh Dinas Perikanan
+          <LogOut size={18} />
+          Keluar
         </button>
-      </div>
-
-      <div className="mt-6 text-center text-[11px] text-slate-400">
-        SiLapor Perikanan Mobile • Versi 1.1.0
+        <p className="mt-6 text-center text-xs text-slate-400">SiLapor • Versi 1.2.0</p>
       </div>
     </div>
   );

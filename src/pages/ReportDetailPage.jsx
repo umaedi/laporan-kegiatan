@@ -1,210 +1,178 @@
-import React, { useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import { useReports } from '../context/ReportContext';
-import CommentSection from '../components/supervisor/CommentSection';
-import { ArrowLeft, Calendar, Clock, MapPin, User, Tag, Image, Trash2, CheckCircle2, AlertTriangle } from 'lucide-react';
+import React, { useEffect } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { ArrowLeft, Calendar, Clock, MapPin, User, Trash2, Waves, Building2, Heart } from 'lucide-react';
+import { useDeleteReport, useReport, useToggleLike } from '../hooks/useReports';
+import { ACTIVITY_TYPE, APPRECIATION_MIN_RATING } from '../shared/enums';
+import CommentSection from '../components/comment/CommentSection';
+import PhotoCarousel from '../components/post/PhotoCarousel';
+import StatusBadge from '../components/post/StatusBadge';
+import StarRating from '../components/post/StarRating';
+import VisibilityBadge from '../components/post/VisibilityBadge';
+import LoadingState from '../components/ui/LoadingState';
+import ErrorState from '../components/ui/ErrorState';
 
 export default function ReportDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { reports, deleteReport } = useReports();
-  const [showPhotoModal, setShowPhotoModal] = useState(false);
+  const location = useLocation();
+  const { data: report, isPending, isError, error, refetch } = useReport(id);
+  const deleteReport = useDeleteReport();
+  const toggleLike = useToggleLike();
 
-  const report = reports.find(r => r.id === id);
+  // Tombol "Komentar" di beranda membuka halaman ini dengan #komentar
+  useEffect(() => {
+    if (report && location.hash === '#komentar') {
+      document.getElementById('komentar')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [report, location.hash]);
 
-  if (!report) {
-    return (
+  if (isPending) return <LoadingState label="Memuat laporan…" />;
+
+  if (isError) {
+    // 404 juga dipakai server untuk laporan yang tidak boleh dilihat
+    return error.status === 404 ? (
       <div className="flex flex-col flex-1 items-center justify-center p-8 text-center">
-        <p className="text-sm text-slate-500 font-medium">Laporan kegiatan tidak ditemukan.</p>
+        <p className="text-base font-bold text-slate-900">Laporan tidak ditemukan</p>
+        <p className="text-sm text-slate-500 mt-1">Laporan mungkin sudah dihapus atau tidak dibagikan kepada Anda.</p>
         <button
-          onClick={() => navigate('/kegiatan')}
-          className="mt-3 px-4 py-2 bg-emerald-700 text-white rounded-xl text-xs font-semibold"
+          type="button"
+          onClick={() => navigate('/')}
+          className="mt-4 h-11 px-5 bg-emerald-700 text-white rounded-xl text-sm font-semibold"
         >
-          Kembali ke Daftar
+          Kembali ke Beranda
         </button>
       </div>
+    ) : (
+      <ErrorState error={error} onRetry={refetch} />
     );
   }
 
   const handleDelete = () => {
     if (window.confirm('Apakah Anda yakin ingin menghapus laporan kegiatan ini?')) {
-      deleteReport(report.id);
-      navigate('/kegiatan');
+      deleteReport.mutate(report.id, { onSuccess: () => navigate('/', { replace: true }) });
     }
   };
 
-  const formatDate = (dateStr) => {
-    try {
-      return new Date(dateStr).toLocaleDateString('id-ID', {
-        weekday: 'long',
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric'
-      });
-    } catch {
-      return dateStr;
-    }
-  };
+  const activityDate = new Date(report.activity_at).toLocaleDateString('id-ID', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  });
+  const isDalamKantor = report.activity_type === ACTIVITY_TYPE.DALAM_KANTOR;
 
   return (
-    <div className="flex flex-col flex-1 pb-12 px-5 pt-3">
-      {/* Top Header Detail */}
-      <div className="flex items-center justify-between mb-3">
+    <div className="flex flex-col flex-1 pb-12 px-4 pt-3 gap-3">
+      {/* Navigasi & aksi pembuat */}
+      <div className="flex items-center justify-between">
         <button
           type="button"
           onClick={() => navigate(-1)}
-          className="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-700 transition-colors"
+          aria-label="Kembali"
+          className="w-10 h-10 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-700 transition-colors"
         >
-          <ArrowLeft size={18} />
+          <ArrowLeft size={20} />
         </button>
-
-        <span className="text-xs font-mono font-bold text-slate-400">
-          {report.id}
-        </span>
-
-        <button
-          type="button"
-          onClick={handleDelete}
-          className="w-9 h-9 rounded-full bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition-colors"
-          title="Hapus Laporan"
-        >
-          <Trash2 size={16} />
-        </button>
+        {report.permissions.can_delete && (
+          <button
+            type="button"
+            onClick={handleDelete}
+            disabled={deleteReport.isPending}
+            aria-label="Hapus laporan"
+            className="w-10 h-10 rounded-full bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition-colors disabled:opacity-50"
+          >
+            <Trash2 size={18} />
+          </button>
+        )}
       </div>
+      {deleteReport.isError && (
+        <p role="alert" className="text-sm text-red-700">{deleteReport.error.message}</p>
+      )}
 
-      {/* Judul Kegiatan & Status */}
-      <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-xs mb-3">
-        <div className="flex items-start justify-between gap-2 mb-2">
-          <div className="flex items-center gap-1.5 flex-wrap">
-            {report.activityType === 'dalam_kantor' ? (
-              <span className="text-[10px] font-bold text-blue-800 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">
-                Dalam Kantor
-              </span>
-            ) : (
-              <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                Luar Kantor
+      <article className="bg-white rounded-2xl border border-slate-100 shadow-xs overflow-hidden">
+        <PhotoCarousel photos={report.photos} alt={report.title} />
+
+        <div className="p-4 space-y-3">
+          <div className="flex items-center gap-2 flex-wrap">
+            <StatusBadge status={report.status} />
+            <VisibilityBadge visibility={report.visibility} />
+          </div>
+
+          <h1 className="text-lg font-extrabold text-slate-900 leading-snug">{report.title}</h1>
+
+          <ul className="space-y-1.5 text-sm text-slate-700">
+            <li className="flex items-center gap-2">
+              <User size={16} className="text-emerald-700 shrink-0" />
+              {report.author?.nama}
+              {report.author?.jabatan && <span className="text-slate-500">· {report.author.jabatan}</span>}
+            </li>
+            <li className="flex items-center gap-2">
+              <Calendar size={16} className="text-emerald-700 shrink-0" />
+              {activityDate}
+            </li>
+            <li className="flex items-center gap-2">
+              <Clock size={16} className="text-emerald-700 shrink-0" />
+              {report.activity_time} WIB
+            </li>
+            <li className="flex items-center gap-2">
+              {isDalamKantor ? (
+                <Building2 size={16} className="text-emerald-700 shrink-0" />
+              ) : (
+                <Waves size={16} className="text-emerald-700 shrink-0" />
+              )}
+              {isDalamKantor ? 'Dalam Kantor' : 'Luar Kantor'}
+            </li>
+            {report.location && (
+              <li className="flex items-center gap-2">
+                <MapPin size={16} className="text-emerald-700 shrink-0" />
+                {report.location}
+              </li>
+            )}
+          </ul>
+
+          {report.description && (
+            <p className="text-sm text-slate-700 leading-6 whitespace-pre-wrap bg-slate-50 rounded-xl p-3">
+              {report.description}
+            </p>
+          )}
+
+          <div className="flex items-center justify-between pt-1">
+            <button
+              type="button"
+              onClick={() => toggleLike.mutate({ id: report.id, liked: report.liked_by_me })}
+              aria-pressed={report.liked_by_me}
+              className={`inline-flex items-center gap-2 h-10 px-4 rounded-xl text-sm font-semibold text-white transition-colors ${
+                report.liked_by_me ? 'bg-teal-900 hover:bg-teal-950' : 'bg-teal-700 hover:bg-teal-800'
+              }`}
+            >
+              <Heart size={18} fill={report.liked_by_me ? 'currentColor' : 'none'} />
+              {report.liked_by_me ? 'Disukai' : 'Sukai'}
+            </button>
+            {report.like_count > 0 && (
+              <span className="text-sm font-semibold text-slate-700">
+                Disukai {report.like_count.toLocaleString('id-ID')} orang
               </span>
             )}
           </div>
-
-          {report.status === 'reviewed' ? (
-            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-100/70 px-2.5 py-0.5 rounded-full">
-              <CheckCircle2 size={12} />
-              Disetujui Atasan
-            </span>
-          ) : report.status === 'revision' ? (
-            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-700 bg-amber-100 px-2.5 py-0.5 rounded-full">
-              <AlertTriangle size={12} />
-              Perlu Catatan
-            </span>
-          ) : (
-            <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-full">
-              Menunggu Review
-            </span>
-          )}
         </div>
+      </article>
 
-        <h1 className="text-lg font-extrabold text-slate-900 leading-snug">
-          {report.title}
-        </h1>
-      </div>
-
-      {/* Foto Bukti Dukung */}
-      <div className="bg-white rounded-2xl p-3 border border-slate-100 shadow-xs mb-3">
-        <span className="text-xs font-bold text-slate-800 block mb-2">
-          Foto Bukti Dukung Kegiatan:
-        </span>
-        {report.photo ? (
-          <div
-            onClick={() => setShowPhotoModal(true)}
-            className="relative rounded-xl overflow-hidden cursor-pointer group bg-slate-900"
-          >
-            <img
-              src={report.photo}
-              alt="Bukti kegiatan"
-              className="w-full h-56 object-cover group-hover:scale-102 transition-transform duration-300"
-            />
-            <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors flex items-center justify-center">
-              <span className="bg-white/90 text-slate-900 text-xs font-bold px-3 py-1.5 rounded-full shadow backdrop-blur-xs flex items-center gap-1">
-                <Image size={14} />
-                Ketuk untuk Memperbesar
-              </span>
-            </div>
-          </div>
+      {/* Nilai bintang dari Kepala Dinas */}
+      <section className="bg-white rounded-2xl p-4 border border-slate-100 shadow-xs">
+        <h2 className="text-sm font-bold text-slate-900 mb-1.5">Penilaian Kepala Dinas</h2>
+        {report.rating > 0 ? (
+          <StarRating value={report.rating} size={20} />
         ) : (
-          <div className="h-32 bg-slate-100 rounded-xl flex items-center justify-center text-xs text-slate-400">
-            Tidak ada foto bukti dukung
-          </div>
+          <p className="text-sm text-slate-500">Belum dinilai.</p>
         )}
+        {report.rating >= APPRECIATION_MIN_RATING && (
+          <p className="text-xs text-emerald-700 font-semibold mt-1.5">Kegiatan terbaik pilihan Kepala Dinas</p>
+        )}
+      </section>
+
+      <div id="komentar" className="scroll-mt-20">
+        <CommentSection report={report} />
       </div>
-
-      {/* Modal Zoom Foto */}
-      {showPhotoModal && report.photo && (
-        <div
-          className="fixed inset-0 z-50 bg-black/90 flex flex-col items-center justify-center p-4 backdrop-blur-xs"
-          onClick={() => setShowPhotoModal(false)}
-        >
-          <img
-            src={report.photo}
-            alt="Bukti besar"
-            className="max-w-full max-h-[80vh] object-contain rounded-2xl shadow-2xl"
-          />
-          <button
-            onClick={() => setShowPhotoModal(false)}
-            className="mt-4 px-5 py-2 bg-white text-slate-900 font-bold text-xs rounded-full shadow"
-          >
-            Tutup
-          </button>
-        </div>
-      )}
-
-      {/* Informasi Detail Kegiatan */}
-      <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-xs space-y-2 mb-3">
-        <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider mb-1">
-          Rincian Pelaksanaan
-        </h3>
-
-        <div className="flex items-center justify-between text-xs py-1.5 dotted-divider">
-          <span className="text-slate-400 font-medium flex items-center gap-1.5">
-            <Calendar size={13} className="text-emerald-700" /> Tanggal
-          </span>
-          <span className="font-bold text-slate-800">{formatDate(report.date)}</span>
-        </div>
-
-        <div className="flex items-center justify-between text-xs py-1.5 dotted-divider">
-          <span className="text-slate-400 font-medium flex items-center gap-1.5">
-            <Clock size={13} className="text-emerald-700" /> Jam Pelaksanaan
-          </span>
-          <span className="font-bold text-slate-800">{report.time || '-'}</span>
-        </div>
-
-        <div className="flex items-center justify-between text-xs py-1.5 dotted-divider">
-          <span className="text-slate-400 font-medium flex items-center gap-1.5">
-            <User size={13} className="text-emerald-700" /> Staf Pelapor
-          </span>
-          <span className="font-bold text-slate-800">{report.reporterName}</span>
-        </div>
-
-        <div className="flex items-center justify-between text-xs py-1.5 dotted-divider">
-          <span className="text-slate-400 font-medium flex items-center gap-1.5">
-            <MapPin size={13} className="text-emerald-700" /> Lokasi
-          </span>
-          <span className="font-bold text-slate-800 text-right truncate max-w-[200px]">
-            {report.location || 'Lapangan Utama'}
-          </span>
-        </div>
-
-        {/* Deskripsi */}
-        <div className="pt-2">
-          <span className="text-xs font-bold text-slate-700 block mb-1">Catatan & Hasil:</span>
-          <div className="text-xs text-slate-600 bg-slate-50 p-3 rounded-xl leading-relaxed whitespace-pre-wrap">
-            {report.description || 'Tidak ada deskripsi tambahan.'}
-          </div>
-        </div>
-      </div>
-
-      {/* Bagian Komentar & Feedback Atasan */}
-      <CommentSection report={report} />
     </div>
   );
 }
