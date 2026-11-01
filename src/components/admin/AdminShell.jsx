@@ -25,7 +25,7 @@ export default function AdminShell() {
           <div className="flex items-center justify-between gap-3">
             <div className="min-w-0">
               <p className="text-xs font-semibold text-emerald-200">Panel Kepala Dinas</p>
-              <h1 className="text-base font-extrabold tracking-tight truncate">{user.name}</h1>
+              <h1 className="text-base font-extrabold tracking-tight truncate">{user.nama}</h1>
             </div>
             <div className="flex items-center gap-2 shrink-0">
               <Link
