@@ -4,9 +4,8 @@ import { Copy, Lock, LayoutDashboard, ChevronRight, LogOut, ImageOff, Download, 
 import { useAuth } from '../context/AuthContext';
 import { useFeed } from '../hooks/useReports';
 import { useInstallPrompt } from '../hooks/useInstallPrompt';
-import { AVATAR_PATH } from '../api/laporan';
+import UserAvatar from '../components/ui/UserAvatar';
 import { ROLE, VISIBILITY } from '../shared/enums';
-import { getInitials } from '../lib/user';
 import LoadingState from '../components/ui/LoadingState';
 import ErrorState from '../components/ui/ErrorState';
 import LoadMore from '../components/ui/LoadMore';
@@ -26,16 +25,7 @@ export default function ProfilePage() {
       <div className="px-4 pt-5 pb-4 border-b border-slate-200">
         <div className="flex items-center gap-4">
           {/* Avatar = foto wajah terbaru (presensi); inisial bila belum ada */}
-          <AuthImage
-            src={AVATAR_PATH}
-            alt={`Foto ${user.nama}`}
-            className="w-20 h-20 rounded-full object-cover shadow-md shrink-0"
-            fallback={
-              <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-emerald-800 to-teal-600 text-white flex items-center justify-center text-2xl font-bold shadow-md shrink-0">
-                {getInitials(user.nama)}
-              </div>
-            }
-          />
+          <UserAvatar user={user} className="w-20 h-20 text-2xl shadow-md" />
           <div className="min-w-0">
             <h2 className="text-base font-extrabold text-slate-900 truncate">{user.nama}</h2>
             {user.jabatan && <p className="text-sm text-emerald-700 font-semibold truncate">{user.jabatan}</p>}

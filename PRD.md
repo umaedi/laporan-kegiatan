@@ -134,6 +134,7 @@ Simbol: ✅ boleh · ❌ tidak boleh · "Sendiri" = hanya milik sendiri.
 | Memberi nilai bintang 1–5                           | ❌                             | ✅                        |
 | Melihat antrean "Perlu Ditinjau"                    | ❌                             | ✅                        |
 | Melihat rekap statistik OPD                         | ❌ (hanya statistik sendiri)   | ✅                        |
+| Melihat foto avatar (foto wajah presensi) pegawai  | Sesama OPD                     | Sesama OPD                |
 
 Matriks ini adalah **sumber kebenaran** untuk otorisasi dan wajib ditegakkan di server (lihat ARCHITECTURE.md §6).
 

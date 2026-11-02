@@ -35,7 +35,7 @@ export function useAddComment(reportId) {
         deleted: false,
         body,
         review_action: null,
-        author: { id: user.id, nama: user.nama, jabatan: user.jabatan, is_kepala_opd: user.role === ROLE.KEPALA_OPD },
+        author: { id: user.id, nama: user.nama, jabatan: user.jabatan, is_kepala_opd: user.role === ROLE.KEPALA_OPD, avatar_url: user.avatar_url },
         created_at: new Date().toISOString(),
         can_delete: false,
         pending: true,

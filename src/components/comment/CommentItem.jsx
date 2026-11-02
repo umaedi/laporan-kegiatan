@@ -2,7 +2,7 @@ import React from 'react';
 import { CheckCircle2, AlertTriangle } from 'lucide-react';
 import { REVIEW_ACTION } from '../../shared/enums';
 import { formatRelativeTime } from '../../lib/date';
-import { getInitials } from '../../lib/user';
+import UserAvatar from '../ui/UserAvatar';
 
 const REVIEW_STYLE = {
   [REVIEW_ACTION.APPROVED]: {
@@ -28,13 +28,10 @@ export default function CommentItem({ comment, isReply = false, onReply, onDelet
 
   return (
     <div className={`flex gap-2.5 ${comment.pending ? 'opacity-60' : ''}`}>
-      <div
-        className={`${isReply ? 'w-7 h-7 text-xs' : 'w-9 h-9 text-sm'} rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold shrink-0 ${
-          author?.is_kepala_opd ? 'ring-2 ring-emerald-600' : ''
-        }`}
-      >
-        {getInitials(author?.nama)}
-      </div>
+      <UserAvatar
+        user={author}
+        className={`${isReply ? 'w-7 h-7 text-xs' : 'w-9 h-9 text-sm'} ${author?.is_kepala_opd ? 'ring-2 ring-emerald-600' : ''}`}
+      />
 
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5 flex-wrap">

@@ -4,11 +4,11 @@ import { Heart, MessageCircle, MapPin, Waves, Building2 } from 'lucide-react';
 import { useToggleLike } from '../../hooks/useReports';
 import { ACTIVITY_TYPE } from '../../shared/enums';
 import { formatRelativeTime } from '../../lib/date';
-import { getInitials } from '../../lib/user';
 import VisibilityBadge from './VisibilityBadge';
 import StarRating from './StarRating';
 import StatusBadge from './StatusBadge';
 import PhotoCarousel from './PhotoCarousel';
+import UserAvatar from '../ui/UserAvatar';
 
 export default function PostCard({ report }) {
   const navigate = useNavigate();
@@ -38,9 +38,7 @@ export default function PostCard({ report }) {
     <article className="bg-white border-b border-slate-200 pb-3">
       {/* Header: avatar, nama, jabatan, waktu */}
       <header className="flex items-center gap-3 px-4 py-2.5">
-        <div className="w-9 h-9 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center text-sm font-bold shrink-0">
-          {getInitials(report.author?.nama)}
-        </div>
+        <UserAvatar user={report.author} />
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold text-slate-900 truncate">{report.author?.nama}</p>
           <p className="flex items-center gap-1 text-xs text-slate-500 min-w-0">
