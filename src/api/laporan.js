@@ -11,6 +11,9 @@ export const logout = () => apiRequest('/api/logout', { method: 'POST' });
 
 export const fetchMe = () => apiRequest(`${BASE}/me`).then(res => res.data);
 
+// Foto wajah terbaru user login, diproksikan backend dari layanan Face Recognition (tampilkan dengan AuthImage)
+export const AVATAR_PATH = `${BASE}/me/avatar`;
+
 // ─── Laporan ────────────────────────────────────────────────────────────────
 export const fetchFeed = ({ filter = 'semua', page = 1, perPage = 10 } = {}) =>
   apiRequest(`${BASE}/feed`, { query: { filter, page, per_page: perPage } }).then(res => res.data);

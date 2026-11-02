@@ -29,14 +29,15 @@ Browser ──► React SPA (Vite, web mandiri) ──HTTPS + JWT──► SIAPT
 | Kepala OPD | User yang menjadi `opds.kepala_id` | Kolom definitif, tanpa menebak dari jabatan |
 | Role `admin` SIAPTUBA | Tidak mendapat akses lintas OPD | Keputusan produk. Karena itu aturan akses tidak memakai Gate/Policy (`Gate::before` memberi admin semua ability) |
 | Foto | Diproses ulang server (≤ 1600 px, JPEG, EXIF dihapus), selalu disimpan di **S3/MinIO**, diambil lewat **`/api/laporan-kegiatan/stream/{id}`** (auth + aturan visibilitas). Tanpa signed URL | Hanya backend yang mengakses S3. Route publik `/api/stream` tidak dipakai karena tanpa login |
+| Avatar | Foto wajah terbaru dari layanan Face Recognition, diambil lewat **`/api/laporan-kegiatan/me/avatar`** (hanya user login sendiri). Ditampilkan dengan `AuthImage` + `fallback` inisial | `FACE_API_KEY` hanya ada di `.env` SIAPTUBA, tidak pernah di bundle frontend |
 | Notifikasi | `SendNotificationJob` SIAPTUBA (tabel `notifications` + FCM) | Infrastruktur yang sudah ada |
 
 ## 3. Backend di SIAPTUBA
 
 | Lapisan | Lokasi |
 |---|---|
-| Route | `routes/api.php` → grup `auth:api`, prefix `laporan-kegiatan`, nama `api.laporan_kegiatan.*`. Termasuk `GET /stream/{photo}` untuk foto |
-| Controller | `app/Http/Controllers/API/LaporanKegiatan/` — `LaporanKegiatanReportController` (me, feed, CRUD), `LaporanKegiatanInteraksiController` (komentar, suka, review, bintang), `LaporanKegiatanAdminController` (panel Kepala OPD), `LaporanKegiatanPhotoController` (stream foto) |
+| Route | `routes/api.php` → grup `auth:api`, prefix `laporan-kegiatan`, nama `api.laporan_kegiatan.*`. Termasuk `GET /stream/{photo}` untuk foto dan `GET /me/avatar` untuk avatar |
+| Controller | `app/Http/Controllers/API/LaporanKegiatan/` — `LaporanKegiatanReportController` (me, feed, CRUD), `LaporanKegiatanInteraksiController` (komentar, suka, review, bintang), `LaporanKegiatanAdminController` (panel Kepala OPD), `LaporanKegiatanPhotoController` (stream foto, avatar) |
 | Aturan akses | `app/Services/LaporanKegiatan/LaporanKegiatanAccess.php` — **satu-satunya** sumber aturan visibilitas |
 | Logika bisnis | `app/Services/LaporanKegiatan/LaporanKegiatanService.php` — transaksi, proses foto, notifikasi |
 | Bentuk JSON | `app/Services/LaporanKegiatan/LaporanKegiatanPresenter.php` |

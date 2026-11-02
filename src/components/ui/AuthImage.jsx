@@ -7,8 +7,9 @@ import { apiBlob } from '../../api/client';
  * Gambar dari endpoint stream backend (butuh token). Blob URL di-cache TanStack Query per path,
  * sehingga foto yang sama di feed, detail, dan profil hanya diunduh sekali. Blob URL dicabut saat
  * cache membuang query-nya (lihat subscriber 'photo' di App.jsx).
+ * `fallback` (mis. inisial avatar) ditampilkan selama memuat dan bila gambar tidak tersedia.
  */
-export default function AuthImage({ src, alt, className = '' }) {
+export default function AuthImage({ src, alt, className = '', fallback }) {
   const { data: objectUrl, isError } = useQuery({
     queryKey: ['photo', src],
     queryFn: async () => URL.createObjectURL(await apiBlob(src)),
@@ -17,6 +18,8 @@ export default function AuthImage({ src, alt, className = '' }) {
     staleTime: Infinity,
     gcTime: 10 * 60 * 1000
   });
+
+  if (fallback && (isError || !objectUrl)) return fallback;
 
   if (isError) {
     return (
