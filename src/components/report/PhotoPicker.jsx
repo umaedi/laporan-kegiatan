@@ -22,7 +22,8 @@ export default function PhotoPicker({ photos, onChange }) {
 
   return (
     <div className="space-y-3">
-      <input type="file" accept="image/jpeg,image/png,image/webp" capture="environment" ref={cameraInputRef} onChange={handleFiles} className="hidden" />
+      {/* Kamera: browser Android hanya membuka kamera langsung bila accept="image/*" (daftar MIME spesifik membuat capture diabaikan) */}
+      <input type="file" accept="image/*" capture="environment" ref={cameraInputRef} onChange={handleFiles} className="hidden" />
       <input type="file" accept="image/jpeg,image/png,image/webp" multiple ref={galleryInputRef} onChange={handleFiles} className="hidden" />
 
       {photos.length === 0 ? (
@@ -69,15 +70,26 @@ export default function PhotoPicker({ photos, onChange }) {
             </div>
           ))}
           {remaining > 0 && (
-            <button
-              type="button"
-              onClick={() => galleryInputRef.current?.click()}
-              aria-label="Tambah foto"
-              className="w-20 h-20 shrink-0 rounded-xl border-2 border-dashed border-slate-300 text-slate-500 flex flex-col items-center justify-center hover:bg-slate-50"
-            >
-              <Plus size={20} />
-              <span className="text-xs">{photos.length}/{MAX_PHOTOS}</span>
-            </button>
+            <>
+              <button
+                type="button"
+                onClick={() => cameraInputRef.current?.click()}
+                aria-label="Tambah foto dari kamera"
+                className="w-20 h-20 shrink-0 rounded-xl border-2 border-dashed border-emerald-400 bg-emerald-50/70 text-emerald-800 flex flex-col items-center justify-center hover:bg-emerald-100/70"
+              >
+                <Camera size={20} />
+                <span className="text-xs">Kamera</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => galleryInputRef.current?.click()}
+                aria-label="Tambah foto dari galeri"
+                className="w-20 h-20 shrink-0 rounded-xl border-2 border-dashed border-slate-300 text-slate-500 flex flex-col items-center justify-center hover:bg-slate-50"
+              >
+                <Plus size={20} />
+                <span className="text-xs">{photos.length}/{MAX_PHOTOS}</span>
+              </button>
+            </>
           )}
         </div>
       )}
