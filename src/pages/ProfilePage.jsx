@@ -1,8 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Copy, Lock, LayoutDashboard, ChevronRight, LogOut, ImageOff } from 'lucide-react';
+import { Copy, Lock, LayoutDashboard, ChevronRight, LogOut, ImageOff, Download, Share } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useFeed } from '../hooks/useReports';
+import { useInstallPrompt } from '../hooks/useInstallPrompt';
 import { ROLE, VISIBILITY } from '../shared/enums';
 import { getInitials } from '../lib/user';
 import LoadingState from '../components/ui/LoadingState';
@@ -12,6 +13,7 @@ import AuthImage from '../components/ui/AuthImage';
 
 export default function ProfilePage() {
   const { user, logout } = useAuth();
+  const { canInstall, install, installed, isIos } = useInstallPrompt();
   const { data, isPending, isError, error, refetch, hasNextPage, isFetchingNextPage, fetchNextPage } = useFeed('saya');
 
   const reports = data?.pages.flatMap(page => page.items) ?? [];
@@ -62,6 +64,30 @@ export default function ProfilePage() {
             </div>
             <ChevronRight size={20} className="text-emerald-200 shrink-0" />
           </Link>
+        )}
+
+        {/* Pasang sebagai aplikasi (PWA) */}
+        {!installed && canInstall && (
+          <button
+            type="button"
+            onClick={install}
+            className="w-full flex items-center gap-3 bg-blue-700 text-white rounded-2xl p-4 mt-4 hover:bg-blue-800 transition-colors text-left"
+          >
+            <Download size={22} className="text-blue-100 shrink-0" />
+            <div className="flex-1">
+              <p className="text-sm font-bold">Pasang Aplikasi</p>
+              <p className="text-xs text-blue-100">Buka SI KERANG KAMPAK langsung dari layar utama</p>
+            </div>
+          </button>
+        )}
+        {!installed && !canInstall && isIos && (
+          <div className="flex items-start gap-3 bg-blue-50 text-blue-900 rounded-2xl p-4 mt-4">
+            <Share size={20} className="shrink-0 mt-0.5" />
+            <p className="text-xs">
+              Untuk memasang aplikasi, ketuk tombol <span className="font-semibold">Bagikan</span> di Safari lalu pilih{' '}
+              <span className="font-semibold">Tambah ke Layar Utama</span>.
+            </p>
+          </div>
         )}
       </div>
 

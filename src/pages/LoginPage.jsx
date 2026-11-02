@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
-import { Fish, Mail, Lock, Eye, EyeOff, LogIn, AlertCircle, Loader2 } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, LogIn, AlertCircle, Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { ROLE } from '../shared/enums';
 
@@ -44,11 +44,12 @@ export default function LoginPage() {
       <div className="w-full max-w-md min-h-screen bg-white flex flex-col px-6 pt-16 pb-8">
         {/* Identitas aplikasi */}
         <div className="flex flex-col items-center text-center mb-10">
-          <div className="w-16 h-16 rounded-2xl bg-emerald-700 text-white flex items-center justify-center shadow-md mb-4">
-            <Fish size={32} />
-          </div>
-          <h1 className="text-2xl font-extrabold text-emerald-900 tracking-tight">Laporan Kegiatan</h1>
-          <p className="text-sm text-slate-500 mt-1">Masuk dengan akun SIAP TUBA Anda</p>
+          <img src="/logo.png" alt="Logo Kabupaten Tulang Bawang" className="h-24 w-auto object-contain mb-4" />
+          <h1 className="text-2xl font-extrabold text-emerald-900 tracking-tight">SI KERANG KAMPAK</h1>
+          <p className="text-xs text-slate-600 mt-1 max-w-xs">
+            Sistem Informasi Kehadiran, Evaluasi, Rekapitulasi dan Kinerja Pegawai yang Akuntabel
+          </p>
+          <p className="text-sm text-slate-500 mt-3">Masuk dengan akun SIAP TUBA Anda</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4" noValidate>

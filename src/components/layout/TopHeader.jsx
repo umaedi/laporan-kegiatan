@@ -18,11 +18,12 @@ export default function TopHeader() {
   return (
     <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-sm border-b border-slate-100 px-4 pt-3 pb-3">
       <div className="flex items-center justify-between gap-3">
-        <div className="min-w-0">
-          <h1 className="text-xl font-extrabold text-emerald-900 tracking-tight leading-tight truncate">
-            {user.opd?.nama_opd ?? 'Laporan Kegiatan'}
-          </h1>
-          <p className="text-xs font-medium text-slate-500 mt-0.5">Laporan Kegiatan Pegawai</p>
+        <div className="flex items-center gap-2.5 min-w-0">
+          <img src="/logo.png" alt="" className="w-8 h-11 object-contain shrink-0" />
+          <div className="min-w-0">
+            <h1 className="text-lg font-extrabold text-emerald-900 tracking-tight leading-tight truncate">SI KERANG KAMPAK</h1>
+            <p className="text-xs font-medium text-slate-500 mt-0.5 truncate">{user.opd?.nama_opd ?? 'Kinerja Pegawai'}</p>
+          </div>
         </div>
 
         <div className="relative shrink-0">

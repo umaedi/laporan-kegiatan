@@ -1,4 +1,4 @@
-# ARCHITECTURE — Laporan Kegiatan Pegawai OPD
+# ARCHITECTURE — SI KERANG KAMPAK (Laporan Kegiatan Pegawai OPD)
 
 Dokumen ini menjelaskan arsitektur untuk kebutuhan di [PRD.md](PRD.md): frontend React di repositori ini dan backend sebagai modul di super app SIAPTUBA.
 
@@ -155,3 +155,13 @@ Navigasi bawah aplikasi pegawai (4 slot): **Beranda · Buat Kegiatan · Apresias
 5. **Data lokal dihapus:** ✅ `ReportContext`, `seedData`, `lib/reports.js` (aturan visibilitas kini hanya di server), `ReportListPage`, `ReportCard`, komponen dashboard lama.
 6. **UI baru:** ✅ carousel multi-foto, unggah hingga 5 foto, komentar dua arah dengan balasan, grid profil, dan "muat lebih banyak" otomatis.
 7. **Belum:** endpoint notifikasi (lonceng di header sementara memakai komentar terbaru dari `feed?filter=saya`), edit laporan (`PATCH` sudah tersedia di API, UI belum), dan halaman Apresiasi.
+
+## PWA (Aplikasi Terpasang)
+
+Nama aplikasi: **SI KERANG KAMPAK** (Sistem Informasi Kehadiran, Evaluasi, Rekapitulasi dan Kinerja Pegawai yang Akuntabel).
+
+- `public/manifest.webmanifest`: nama, warna tema, ikon `favicon.png` (192) dan `pwa.png` (512, `any` + `maskable`). `logo.png` dipakai di header dan halaman masuk.
+- `public/sw.js`: didaftarkan oleh `src/lib/pwa.js` hanya di build produksi. Halaman memakai strategi *network-first* (cadangan offline dari cache), aset statis *cache-first*. Permintaan non-GET dan lintas origin (API SIAPTUBA, termasuk foto `/stream`) **tidak pernah** di-cache.
+- Nama cache memuat `__BUILD_ID__` yang diganti plugin di `vite.config.js` setiap build, sehingga cache lama terhapus saat rilis baru.
+- `public/serve.json`: `Cache-Control: no-cache` untuk `sw.js`, manifest, dan `index.html` (server produksi memakai `serve -s dist`).
+- Tombol **Pasang Aplikasi** di halaman Profil (`useInstallPrompt`); di iOS ditampilkan petunjuk "Tambah ke Layar Utama".
