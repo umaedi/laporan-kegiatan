@@ -142,7 +142,7 @@ export default function ReportDetailPage() {
               onClick={() => toggleLike.mutate({ id: report.id, liked: report.liked_by_me })}
               aria-pressed={report.liked_by_me}
               className={`inline-flex items-center gap-2 h-10 px-4 rounded-xl text-sm font-semibold text-white transition-colors ${
-                report.liked_by_me ? 'bg-teal-900 hover:bg-teal-950' : 'bg-teal-700 hover:bg-teal-800'
+                report.liked_by_me ? 'bg-emerald-800 hover:bg-emerald-900' : 'bg-emerald-600 hover:bg-emerald-700'
               }`}
             >
               <Heart size={18} fill={report.liked_by_me ? 'currentColor' : 'none'} />

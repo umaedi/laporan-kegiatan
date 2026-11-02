@@ -1,4 +1,4 @@
-# DESIGN SYSTEM — Laporan Kegiatan Pegawai OPD
+# DESIGN SYSTEM — SI KERANG KAMPAK
 
 Bahasa visual: **feed sosial bergaya Instagram** (foto sebagai pusat perhatian, kartu tanpa bingkai, aksi ikonik) dengan **identitas institusi pemerintah** (hijau emerald, tipografi tegas, badge status yang jelas). Mobile-first, satu kolom.
 
@@ -58,7 +58,8 @@ Token didefinisikan sekali di `src/index.css` melalui `@theme` Tailwind v4, lalu
   --color-act-dalam: #1d4ed8;   /* Dalam Kantor — Building2 */
 
   /* Lain-lain */
-  --color-like:   #0f766e;      /* tombol Sukai (teal-700, senada dengan brand hijau) */
+  --color-like:    #059669;     /* tombol Sukai (emerald-600; Disukai emerald-800) */
+  --color-comment: #1d4ed8;     /* tombol Komentar (blue-700) */
   --color-danger: #dc2626;
 }
 ```

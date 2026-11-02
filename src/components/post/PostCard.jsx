@@ -64,7 +64,7 @@ export default function PostCard({ report }) {
           onClick={handleLike}
           aria-pressed={isLiked}
           className={`inline-flex items-center justify-center gap-2 h-11 rounded-xl text-sm font-semibold text-white transition-colors active:scale-[0.97] ${
-            isLiked ? 'bg-teal-900 hover:bg-teal-950' : 'bg-teal-700 hover:bg-teal-800'
+            isLiked ? 'bg-emerald-800 hover:bg-emerald-900' : 'bg-emerald-600 hover:bg-emerald-700'
           }`}
         >
           <Heart
@@ -78,7 +78,7 @@ export default function PostCard({ report }) {
         <button
           type="button"
           onClick={() => navigate(`${detailPath}#komentar`)}
-          className="inline-flex items-center justify-center gap-2 h-11 rounded-xl text-sm font-semibold text-white bg-emerald-700 hover:bg-emerald-800 transition-colors active:scale-[0.97]"
+          className="inline-flex items-center justify-center gap-2 h-11 rounded-xl text-sm font-semibold text-white bg-blue-700 hover:bg-blue-800 transition-colors active:scale-[0.97]"
         >
           <MessageCircle size={20} />
           Komentar
